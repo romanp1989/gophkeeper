@@ -2,8 +2,8 @@ package grpc
 
 import (
 	"context"
+	"database/sql"
 	serverConfig "github.com/romanp1989/gophkeeper/internal/server/config"
-	db2 "github.com/romanp1989/gophkeeper/internal/server/db"
 	"github.com/romanp1989/gophkeeper/internal/server/grpc/handlers"
 	"github.com/romanp1989/gophkeeper/internal/server/grpc/interceptors"
 	"github.com/romanp1989/gophkeeper/internal/server/secret"
@@ -25,8 +25,8 @@ type Server struct {
 	logger     *zap.Logger
 }
 
-func NewServer(config *serverConfig.Config, logger *zap.Logger) *Server {
-	grpcServer := grpcServerSetup(config, logger)
+func NewServer(config *serverConfig.Config, db *sql.DB, logger *zap.Logger) *Server {
+	grpcServer := grpcServerSetup(config, db, logger)
 	return &Server{
 		config:     config,
 		grpcServer: grpcServer,
@@ -35,12 +35,7 @@ func NewServer(config *serverConfig.Config, logger *zap.Logger) *Server {
 }
 
 // grpcServerSetup Конфигурирование GRPC сервера
-func grpcServerSetup(cfg *serverConfig.Config, logger *zap.Logger) *grpc.Server {
-	db, err := db2.NewDB(cfg.Db)
-	if err != nil {
-		logger.Fatal("Failed to connect to database", zap.Error(err))
-	}
-
+func grpcServerSetup(cfg *serverConfig.Config, db *sql.DB, logger *zap.Logger) *grpc.Server {
 	tokenService := token.NewJwtService(cfg.Token)
 	opts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(interceptors.Authentication(tokenService)),
@@ -58,8 +53,8 @@ func grpcServerSetup(cfg *serverConfig.Config, logger *zap.Logger) *grpc.Server 
 	userRepository := user.NewUserRepository(db)
 	secretRepository := secret.NewSecretRepository(db)
 
-	proto.RegisterUsersServer(server, handlers.NewUserHandler(cfg, user.NewUserService(userRepository), logger))
-	proto.RegisterSecretsServer(server, handlers.NewSecretHandler(cfg, secret.NewSecretService(secretRepository), logger))
+	proto.RegisterUsersServer(server, handlers.NewUserHandler(user.NewUserService(userRepository), logger))
+	proto.RegisterSecretsServer(server, handlers.NewSecretHandler(secret.NewSecretService(secretRepository), logger))
 
 	return server
 }

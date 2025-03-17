@@ -1,7 +1,9 @@
 package server
 
 import (
+	"database/sql"
 	serverConfig "github.com/romanp1989/gophkeeper/internal/server/config"
+	dbService "github.com/romanp1989/gophkeeper/internal/server/db"
 	"github.com/romanp1989/gophkeeper/internal/server/grpc"
 	logger2 "github.com/romanp1989/gophkeeper/internal/server/logger"
 	"go.uber.org/zap"
@@ -9,6 +11,8 @@ import (
 )
 
 func main() {
+	var db *sql.DB
+
 	logger, err := logger2.NewLogger(false)
 	if err != nil {
 		log.Fatal(err)
@@ -19,7 +23,12 @@ func main() {
 		logger.Fatal("Error loading config", zap.Error(err))
 	}
 
-	server := grpc.NewServer(cfg, logger)
+	db, err = dbService.InitDB(cfg.Db, logger)
+	if err != nil {
+		logger.Fatal("Error initializing database", zap.Error(err))
+	}
+
+	server := grpc.NewServer(cfg, db, logger)
 	err = server.Start()
 	if err != nil {
 		logger.Fatal("Error starting server", zap.Error(err))

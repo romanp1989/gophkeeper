@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/romanp1989/gophkeeper/domain"
-	"github.com/romanp1989/gophkeeper/internal/server/config"
-	"github.com/romanp1989/gophkeeper/internal/server/secret"
 	"github.com/romanp1989/gophkeeper/pkg/consts"
 	"github.com/romanp1989/gophkeeper/pkg/converter"
 	"github.com/romanp1989/gophkeeper/pkg/proto"
@@ -17,16 +15,22 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+type ISecretService interface {
+	Get(ctx context.Context, secretID uint64, userID domain.UserID) (*domain.Secret, error)
+	GetUserSecrets(ctx context.Context, userID domain.UserID) ([]*domain.Secret, error)
+	Add(ctx context.Context, secret *domain.Secret) (*domain.Secret, error)
+	Update(ctx context.Context, secret *domain.Secret) (*domain.Secret, error)
+	Delete(ctx context.Context, secretID uint64, userID domain.UserID) error
+}
+
 type SecretHandler struct {
 	proto.UnimplementedSecretsServer
-	config        *config.Config
-	secretService *secret.Service
+	secretService ISecretService
 	logger        *zap.Logger
 }
 
-func NewSecretHandler(config *config.Config, secretService *secret.Service, logger *zap.Logger) *SecretHandler {
+func NewSecretHandler(secretService ISecretService, logger *zap.Logger) *SecretHandler {
 	return &SecretHandler{
-		config:        config,
 		secretService: secretService,
 		logger:        logger,
 	}

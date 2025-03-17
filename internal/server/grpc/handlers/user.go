@@ -4,26 +4,28 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	serverConfig "github.com/romanp1989/gophkeeper/internal/server/config"
+	"github.com/romanp1989/gophkeeper/domain"
 	"github.com/romanp1989/gophkeeper/internal/server/token"
-	"github.com/romanp1989/gophkeeper/internal/server/user"
 	"github.com/romanp1989/gophkeeper/pkg/proto"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
+type IUserService interface {
+	RegisterUser(ctx context.Context, login string, password string) (*domain.User, error)
+	LoginUser(ctx context.Context, login string, password string) (*domain.User, error)
+}
+
 type UserHandler struct {
 	proto.UnimplementedUsersServer
-	config       *serverConfig.Config
-	userService  *user.UserService
+	userService  IUserService
 	tokenService token.Service
 	logger       *zap.Logger
 }
 
-func NewUserHandler(config *serverConfig.Config, userService *user.UserService, logger *zap.Logger) *UserHandler {
+func NewUserHandler(userService IUserService, logger *zap.Logger) *UserHandler {
 	return &UserHandler{
-		config:      config,
 		userService: userService,
 		logger:      logger,
 	}

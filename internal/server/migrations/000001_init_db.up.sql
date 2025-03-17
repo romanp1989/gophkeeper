@@ -19,6 +19,6 @@ create table if not exists "secrets"
     title varchar(255) not null,
     metadata jsonb,
     payload bytea not null,
-    type secret_type not null,
+    secret_type secret_type not null,
     text varchar(2000)
 );

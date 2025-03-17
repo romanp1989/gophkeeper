@@ -1,0 +1,9 @@
+# IDEs directories
+.idea
+
+# env file
+.env
+
+# Certs
+certs/*.pem
+certs/*.srl
