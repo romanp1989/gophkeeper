@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/romanp1989/gophkeeper/internal/server/domain"
+	"github.com/romanp1989/gophkeeper/domain"
 )
 
 type ISecretRepository interface {
@@ -28,7 +28,7 @@ func (s *Service) Get(ctx context.Context, secretID uint64, userID domain.UserID
 	secret, err := s.repository.GetByID(ctx, secretID, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("secret not found id %w", secretID)
+			return nil, fmt.Errorf("secret not found id %d", secretID)
 		}
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (s *Service) GetUserSecrets(ctx context.Context, userID domain.UserID) ([]*
 	secrets, err := s.repository.GetAllByUserID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("user's secrets not found id %w", userID)
+			return nil, fmt.Errorf("user's secrets not found id %d", userID)
 		}
 		return nil, err
 	}
@@ -64,10 +64,10 @@ func (s *Service) Update(ctx context.Context, secret *domain.Secret) (*domain.Se
 	secret, err = s.repository.Update(ctx, secret)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("secret not found id %w", secret.ID)
+			return nil, fmt.Errorf("secret not found id %d", secret.ID)
 		}
 
-		return nil, fmt.Errorf("failed to update secret: %w", err)
+		return nil, fmt.Errorf("failed to update secret: %d", err)
 	}
 
 	return secret, nil
@@ -77,7 +77,7 @@ func (s *Service) Delete(ctx context.Context, secretID uint64, userID domain.Use
 	err := s.repository.Delete(ctx, secretID, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("secret not found id %w", secretID)
+			return fmt.Errorf("secret not found id %d", secretID)
 		}
 		return fmt.Errorf("failed to delete secret: %w", err)
 	}

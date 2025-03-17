@@ -1,7 +1,7 @@
 package converter
 
 import (
-	"github.com/romanp1989/gophkeeper/internal/server/domain"
+	"github.com/romanp1989/gophkeeper/domain"
 	"github.com/romanp1989/gophkeeper/pkg/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

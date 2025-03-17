@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/romanp1989/gophkeeper/internal/server/domain"
+	"github.com/romanp1989/gophkeeper/domain"
 	storageErrors "github.com/romanp1989/gophkeeper/pkg/errors"
 )
 
@@ -35,7 +35,7 @@ func (r *SecretRepository) Create(ctx context.Context, secret *domain.Secret) (*
 }
 
 func (r *SecretRepository) GetAllByUserID(ctx context.Context, userID domain.UserID) ([]*domain.Secret, error) {
-	rows, err := r.db.Query("SELECT * FROM secrets WHERE user_id = ? ORDER BY updated_at DESC", userID)
+	rows, err := r.db.QueryContext(ctx, "SELECT * FROM secrets WHERE user_id = ? ORDER BY updated_at DESC", userID)
 	if err != nil {
 		return nil, err
 	}

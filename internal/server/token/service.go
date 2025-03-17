@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/romanp1989/gophkeeper/internal/server/domain"
+	"github.com/romanp1989/gophkeeper/domain"
 	"github.com/romanp1989/gophkeeper/pkg/consts"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -20,7 +20,7 @@ type Service struct {
 	tokenName  string
 }
 
-type claims struct {
+type Claims struct {
 	jwt.RegisteredClaims
 	UserID uint64 `json:"user_id,omitempty"`
 }
@@ -57,7 +57,7 @@ func (s *Service) LoadUserID(ctx context.Context) (domain.UserID, error) {
 }
 
 func (s *Service) BuildToken(id domain.UserID) (string, error) {
-	token := jwt.NewWithClaims(s.signMethod, claims{
+	token := jwt.NewWithClaims(s.signMethod, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.expire)),
 		},
@@ -72,8 +72,8 @@ func (s *Service) BuildToken(id domain.UserID) (string, error) {
 	return tokenString, nil
 }
 
-func (s *Service) ParseToken(tokenStr string) (*claims, error) {
-	cl := &claims{}
+func (s *Service) ParseToken(tokenStr string) (*Claims, error) {
+	cl := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, cl,
 		func(t *jwt.Token) (interface{}, error) {
 			if t.Method.Alg() != s.signMethod.Alg() {

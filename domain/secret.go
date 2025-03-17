@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"bytes"
+	"fmt"
+	"time"
+)
 
 // Secret описывает структуру для хранения конфиденциальных данных пользователя
 type Secret struct {
@@ -15,7 +19,7 @@ type Secret struct {
 	// Title - заголовок секрета
 	Title string `db:"title" json:"title"`
 	// Metadata - метаданные, связанные с секретом
-	Metadata map[string]interface{} `db:"metadata" json:"metadata"`
+	Metadata string `db:"metadata" json:"metadata"`
 	// Payload - данные секрета в зашифрованном виде
 	Payload []byte `db:"payload" json:"payload"`
 	// SecretType - тип секрета
@@ -84,4 +88,25 @@ type Card struct {
 	ExpMonth uint32 `json:"exp_month"`
 	// CVV - CVV-код карты
 	CVV uint32 `json:"cvv"`
+}
+
+// ToClipboard форматирует информацию секрета для использования в буфере обмена.
+func (s Secret) ToClipboard() string {
+	var b bytes.Buffer
+
+	switch SecretType(s.SecretType) {
+	case CredSecret:
+		b.WriteString(fmt.Sprintf("login: %s\n", s.Credentials.Login))
+		b.WriteString(fmt.Sprintf("password: %s", s.Credentials.Password))
+	case CardSecret:
+		b.WriteString(fmt.Sprintf("Card Number: %s\n", s.Card.Number))
+		b.WriteString(fmt.Sprintf("Exp: %d/%d", s.Card.ExpMonth, s.Card.ExpYear))
+		b.WriteString(fmt.Sprintf("CVV: %d", s.Card.CVV))
+	case TextSecret:
+		b.WriteString(fmt.Sprintf("Text: %s\n", s.Text.Content))
+	case BlobSecret:
+		b.WriteString("File data cannot be moved to clipboard\n")
+	}
+
+	return b.String()
 }

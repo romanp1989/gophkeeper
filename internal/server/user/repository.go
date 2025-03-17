@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/romanp1989/gophkeeper/internal/server/domain"
+	"github.com/romanp1989/gophkeeper/domain"
 	storageErrors "github.com/romanp1989/gophkeeper/pkg/errors"
 )
 

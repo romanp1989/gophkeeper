@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// NewLogger создает экземплят логгера для приложения
+// NewLogger создает экземпляр логгера для приложения
 func NewLogger(debug bool) (*zap.Logger, error) {
 	zCfg := zap.Config{
 		Level:    zap.NewAtomicLevelAt(zap.InfoLevel),
