@@ -15,12 +15,12 @@ func TestSecretRepository(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		testFunc  func(t *testing.T, repo ISecretRepository, mock sqlmock.Sqlmock)
+		testFunc  func(t *testing.T, repo SecretRepository, mock sqlmock.Sqlmock)
 		expectErr bool
 	}{
 		{
 			name: "GetByID_Success",
-			testFunc: func(t *testing.T, repo ISecretRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo SecretRepository, mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "user_id", "title", "metadata", "secret_type", "payload", "created_at", "updated_at"}).
 					AddRow(1, 1, "Test Secret", "Metadata", "text", []byte("payload"), time.Now(), time.Now())
 
@@ -40,7 +40,7 @@ func TestSecretRepository(t *testing.T) {
 		},
 		{
 			name: "GetByID_Fail_NotFound",
-			testFunc: func(t *testing.T, repo ISecretRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo SecretRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(`SELECT \* FROM secrets WHERE id = \$1 AND user_id = \$2`).
 					WithArgs(1, 1).
 					WillReturnError(sql.ErrNoRows)
@@ -54,7 +54,7 @@ func TestSecretRepository(t *testing.T) {
 		},
 		{
 			name: "GetAllByUserID_Success",
-			testFunc: func(t *testing.T, repo ISecretRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo SecretRepository, mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "user_id", "title", "metadata", "secret_type", "payload", "created_at", "updated_at"}).
 					AddRow(1, 1, "Secret 1", "Metadata 1", "text", []byte("payload1"), time.Now(), time.Now()).
 					AddRow(2, 1, "Secret 2", "Metadata 2", "text", []byte("payload2"), time.Now(), time.Now())
@@ -75,7 +75,7 @@ func TestSecretRepository(t *testing.T) {
 		},
 		{
 			name: "GetAllByUserID_Fail_QueryError",
-			testFunc: func(t *testing.T, repo ISecretRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo SecretRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(`SELECT \* FROM secrets WHERE user_id = \$1 ORDER BY updated_at DESC`).
 					WithArgs(1).
 					WillReturnError(fmt.Errorf("database error"))
@@ -89,7 +89,7 @@ func TestSecretRepository(t *testing.T) {
 		},
 		{
 			name: "Create_Success",
-			testFunc: func(t *testing.T, repo ISecretRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo SecretRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(`INSERT INTO secrets \(user_id, title, metadata, secret_type, payload\) VALUES \(\$1, \$2, \$3, \$4, \$5\) RETURNING id`).
 					WithArgs(1, "Test Secret", "Metadata", "text", []byte("payload")).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
@@ -113,7 +113,7 @@ func TestSecretRepository(t *testing.T) {
 		},
 		{
 			name: "Update_Success",
-			testFunc: func(t *testing.T, repo ISecretRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo SecretRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectQuery(`SELECT 1 FROM secrets WHERE id = \$1 FOR UPDATE`).
 					WithArgs(1).
@@ -140,7 +140,7 @@ func TestSecretRepository(t *testing.T) {
 		},
 		{
 			name: "Delete_Success",
-			testFunc: func(t *testing.T, repo ISecretRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo SecretRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectExec(`DELETE FROM secrets WHERE id = \$1 AND user_id = \$2`).
 					WithArgs(1, 1).
 					WillReturnResult(sqlmock.NewResult(0, 1))

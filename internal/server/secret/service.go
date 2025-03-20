@@ -8,7 +8,7 @@ import (
 	"github.com/romanp1989/gophkeeper/domain"
 )
 
-type ISecretRepository interface {
+type SecretRepository interface {
 	Create(ctx context.Context, secret *domain.Secret) (*domain.Secret, error)
 	GetAllByUserID(ctx context.Context, userID domain.UserID) ([]*domain.Secret, error)
 	GetByID(ctx context.Context, id uint64, userID domain.UserID) (*domain.Secret, error)
@@ -17,10 +17,10 @@ type ISecretRepository interface {
 }
 
 type Service struct {
-	repository ISecretRepository
+	repository SecretRepository
 }
 
-func NewSecretService(repository ISecretRepository) *Service {
+func NewSecretService(repository SecretRepository) *Service {
 	return &Service{repository: repository}
 }
 

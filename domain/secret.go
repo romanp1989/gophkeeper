@@ -8,21 +8,21 @@ import (
 
 // Secret описывает структуру для хранения конфиденциальных данных пользователя
 type Secret struct {
-	// ID - уникальный номер записи с конфиденциальной инфомарцией
+	// Уникальный номер записи с конфиденциальной инфомарцией
 	ID uint64 `db:"id" json:"id"`
-	// UserID - идентификатор пользователя, владельца секрета
+	// Идентификатор пользователя, владельца секрета
 	UserID UserID `db:"user_id"`
-	// CreatedAt - время создания секрета
+	// Время создания секрета
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
-	// UpdatedAt - время последнего обновления секрета
+	// Время последнего обновления секрета
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
-	// Title - заголовок секрета
+	// Заголовок секрета
 	Title string `db:"title" json:"title"`
-	// Metadata - метаданные, связанные с секретом
+	// Метаданные, связанные с секретом
 	Metadata string `db:"metadata" json:"metadata"`
-	// Payload - данные секрета в зашифрованном виде
+	// Данные секрета в зашифрованном виде
 	Payload []byte `db:"payload" json:"payload"`
-	// SecretType - тип секрета
+	// Тип секрета
 	SecretType string `db:"secret_type" json:"secret_type"`
 
 	// Следующие поля не включаются в БД, используются только в методах.

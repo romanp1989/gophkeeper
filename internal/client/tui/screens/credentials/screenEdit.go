@@ -103,26 +103,15 @@ func (s *CredentialEditScreen) Submit() error {
 		err error
 	)
 
+	err = s.Validate()
+	if err != nil {
+		return err
+	}
+
 	title := s.inputGroup.Inputs[credTitle].Value()
 	metadata := s.inputGroup.Inputs[credMetadata].Value()
 	login := s.inputGroup.Inputs[credLogin].Value()
 	password := s.inputGroup.Inputs[credPassword].Value()
-
-	if len(metadata) == 0 {
-		return errors.New("please enter metadata")
-	}
-
-	if len(title) == 0 {
-		return errors.New("please enter title")
-	}
-
-	if len(login) == 0 {
-		return errors.New("please enter login")
-	}
-
-	if len(password) == 0 {
-		return errors.New("please enter password")
-	}
 
 	s.secret.Title = title
 	s.secret.Metadata = metadata
@@ -137,6 +126,27 @@ func (s *CredentialEditScreen) Submit() error {
 	}
 
 	return err
+}
+
+// Validate Валидация данных, введенных пользователем
+func (s *CredentialEditScreen) Validate() error {
+	if len(s.inputGroup.Inputs[credMetadata].Value()) == 0 {
+		return errors.New("please enter metadata")
+	}
+
+	if len(s.inputGroup.Inputs[credTitle].Value()) == 0 {
+		return errors.New("please enter title")
+	}
+
+	if len(s.inputGroup.Inputs[credLogin].Value()) == 0 {
+		return errors.New("please enter login")
+	}
+
+	if len(s.inputGroup.Inputs[credPassword].Value()) == 0 {
+		return errors.New("please enter password")
+	}
+
+	return nil
 }
 
 // View отображает текущее состояние экрана в виде строки.

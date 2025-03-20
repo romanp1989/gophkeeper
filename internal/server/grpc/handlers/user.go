@@ -12,19 +12,19 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type IUserService interface {
+type UserService interface {
 	RegisterUser(ctx context.Context, login string, password string) (*domain.User, error)
 	LoginUser(ctx context.Context, login string, password string) (*domain.User, error)
 }
 
 type UserHandler struct {
 	proto.UnimplementedUsersServer
-	userService  IUserService
+	userService  UserService
 	tokenService token.Service
 	logger       *zap.Logger
 }
 
-func NewUserHandler(userService IUserService, logger *zap.Logger) *UserHandler {
+func NewUserHandler(userService UserService, logger *zap.Logger) *UserHandler {
 	return &UserHandler{
 		userService: userService,
 		logger:      logger,

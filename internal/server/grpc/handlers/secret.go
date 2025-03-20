@@ -15,7 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type ISecretService interface {
+type SecretService interface {
 	Get(ctx context.Context, secretID uint64, userID domain.UserID) (*domain.Secret, error)
 	GetUserSecrets(ctx context.Context, userID domain.UserID) ([]*domain.Secret, error)
 	Add(ctx context.Context, secret *domain.Secret) (*domain.Secret, error)
@@ -25,11 +25,11 @@ type ISecretService interface {
 
 type SecretHandler struct {
 	proto.UnimplementedSecretsServer
-	secretService ISecretService
+	secretService SecretService
 	logger        *zap.Logger
 }
 
-func NewSecretHandler(secretService ISecretService, logger *zap.Logger) *SecretHandler {
+func NewSecretHandler(secretService SecretService, logger *zap.Logger) *SecretHandler {
 	return &SecretHandler{
 		secretService: secretService,
 		logger:        logger,

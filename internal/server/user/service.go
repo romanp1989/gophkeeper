@@ -13,22 +13,22 @@ import (
 // ErrBadCredentials определяет ошибку, возникающую при неверных учетных данных для аутентификации.
 var ErrBadCredentials = errors.New("bad token credentials")
 
-type IUserRepository interface {
+type UserRepository interface {
 	CreateUser(ctx context.Context, user *domain.User) (domain.UserID, error)
 	FindByLogin(ctx context.Context, login string) (*domain.User, error)
 }
 
-type UserService struct {
-	userRepository IUserRepository
+type Service struct {
+	userRepository UserRepository
 }
 
 // NewUserService создает новый экземпляр UserService с заданным репозиторием
-func NewUserService(userRepository IUserRepository) *UserService {
-	return &UserService{userRepository: userRepository}
+func NewUserService(userRepository UserRepository) *Service {
+	return &Service{userRepository: userRepository}
 }
 
 // RegisterUser метод регистрации пользователя
-func (s *UserService) RegisterUser(ctx context.Context, login string, password string) (*domain.User, error) {
+func (s *Service) RegisterUser(ctx context.Context, login string, password string) (*domain.User, error) {
 	var newUser *domain.User
 
 	user, err := s.userRepository.FindByLogin(ctx, login)
@@ -64,7 +64,7 @@ func (s *UserService) RegisterUser(ctx context.Context, login string, password s
 }
 
 // Login метод авторизации пользователя
-func (s *UserService) LoginUser(ctx context.Context, login string, password string) (*domain.User, error) {
+func (s *Service) LoginUser(ctx context.Context, login string, password string) (*domain.User, error) {
 	user, err := s.userRepository.FindByLogin(ctx, login)
 	if err != nil {
 		if errors.Is(err, storageErrors.ErrNotFound) {

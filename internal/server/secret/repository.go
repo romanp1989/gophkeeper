@@ -8,15 +8,15 @@ import (
 	storageErrors "github.com/romanp1989/gophkeeper/pkg/errors"
 )
 
-type SecretRepository struct {
+type Repository struct {
 	db *sql.DB
 }
 
-func NewSecretRepository(db *sql.DB) *SecretRepository {
-	return &SecretRepository{db: db}
+func NewSecretRepository(db *sql.DB) *Repository {
+	return &Repository{db: db}
 }
 
-func (r *SecretRepository) Create(ctx context.Context, secret *domain.Secret) (*domain.Secret, error) {
+func (r *Repository) Create(ctx context.Context, secret *domain.Secret) (*domain.Secret, error) {
 	var insertedID uint64
 
 	query := `INSERT INTO secrets (user_id, title, metadata, secret_type, payload) 
@@ -34,7 +34,7 @@ func (r *SecretRepository) Create(ctx context.Context, secret *domain.Secret) (*
 	return secret, nil
 }
 
-func (r *SecretRepository) GetAllByUserID(ctx context.Context, userID domain.UserID) ([]*domain.Secret, error) {
+func (r *Repository) GetAllByUserID(ctx context.Context, userID domain.UserID) ([]*domain.Secret, error) {
 	rows, err := r.db.QueryContext(ctx, "SELECT * FROM secrets WHERE user_id = ? ORDER BY updated_at DESC", userID)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (r *SecretRepository) GetAllByUserID(ctx context.Context, userID domain.Use
 	return secrets, nil
 }
 
-func (r *SecretRepository) GetByID(ctx context.Context, id uint64, userID domain.UserID) (*domain.Secret, error) {
+func (r *Repository) GetByID(ctx context.Context, id uint64, userID domain.UserID) (*domain.Secret, error) {
 	var secret domain.Secret
 
 	query := `SELECT * FROM secrets WHERE id = $1 AND user_id = $2`
@@ -74,7 +74,7 @@ func (r *SecretRepository) GetByID(ctx context.Context, id uint64, userID domain
 }
 
 // Update обновление конфиденциальных данных
-func (r *SecretRepository) Update(ctx context.Context, secret *domain.Secret) (*domain.Secret, error) {
+func (r *Repository) Update(ctx context.Context, secret *domain.Secret) (*domain.Secret, error) {
 	var secretID uint64
 	err := r.db.QueryRowContext(ctx, "SELECT id FROM secrets WHERE user_id = $1 AND id = $2 FOR UPDATE", secret.UserID, secret.ID).Scan(secretID)
 	if err != nil {
@@ -94,7 +94,7 @@ func (r *SecretRepository) Update(ctx context.Context, secret *domain.Secret) (*
 }
 
 // Delete удаление конфиденциальных данных
-func (r *SecretRepository) Delete(ctx context.Context, id uint64, userID domain.UserID) error {
+func (r *Repository) Delete(ctx context.Context, id uint64, userID domain.UserID) error {
 	var secretID uint64
 	err := r.db.QueryRowContext(ctx, "SELECT id FROM secrets WHERE user_id = $1 AND id = $2 FOR UPDATE", userID, id).Scan(secretID)
 	if err != nil {

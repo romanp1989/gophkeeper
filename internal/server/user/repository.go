@@ -8,16 +8,16 @@ import (
 	storageErrors "github.com/romanp1989/gophkeeper/pkg/errors"
 )
 
-type UserRepository struct {
+type Repository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
-	return &UserRepository{db}
+func NewUserRepository(db *sql.DB) *Repository {
+	return &Repository{db}
 }
 
 // CreateUser Создание нового пользователя
-func (r *UserRepository) CreateUser(ctx context.Context, user *domain.User) (domain.UserID, error) {
+func (r *Repository) CreateUser(ctx context.Context, user *domain.User) (domain.UserID, error) {
 	var newUserID domain.UserID
 
 	err := r.db.QueryRowContext(ctx,
@@ -36,7 +36,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *domain.User) (dom
 }
 
 // FindByLogin Поиск пользователя по логину
-func (r *UserRepository) FindByLogin(ctx context.Context, login string) (*domain.User, error) {
+func (r *Repository) FindByLogin(ctx context.Context, login string) (*domain.User, error) {
 	u := domain.User{}
 
 	err := r.db.QueryRowContext(ctx,

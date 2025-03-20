@@ -16,12 +16,12 @@ func TestUserRepository(t *testing.T) {
 	ctx := context.Background()
 	tests := []struct {
 		name      string
-		testFunc  func(t *testing.T, repo IUserRepository, mock sqlmock.Sqlmock)
+		testFunc  func(t *testing.T, repo UserRepository, mock sqlmock.Sqlmock)
 		expectErr bool
 	}{
 		{
 			name: "CreateUser_Success",
-			testFunc: func(t *testing.T, repo IUserRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo UserRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(`INSERT INTO users \(login, password\) VALUES \(\$1, \$2\) RETURNING id`).
 					WithArgs("new_user", "hashed_password").
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
@@ -42,7 +42,7 @@ func TestUserRepository(t *testing.T) {
 		},
 		{
 			name: "CreateUser_Fail_DatabaseError",
-			testFunc: func(t *testing.T, repo IUserRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo UserRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(`INSERT INTO users \(login, password\) VALUES \(\$1, \$2\) RETURNING id`).
 					WithArgs("new_user", "hashed_password").
 					WillReturnError(fmt.Errorf("database error"))
@@ -60,7 +60,7 @@ func TestUserRepository(t *testing.T) {
 		},
 		{
 			name: "FindByLogin_Success",
-			testFunc: func(t *testing.T, repo IUserRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo UserRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(`SELECT id, login, created_at, password FROM users WHERE id = \$1`).
 					WithArgs("existing_user").
 					WillReturnRows(sqlmock.NewRows([]string{"id", "login", "created_at", "password"}).
@@ -78,7 +78,7 @@ func TestUserRepository(t *testing.T) {
 		},
 		{
 			name: "FindByLogin_Fail_NotFound",
-			testFunc: func(t *testing.T, repo IUserRepository, mock sqlmock.Sqlmock) {
+			testFunc: func(t *testing.T, repo UserRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(`SELECT id, login, created_at, password FROM users WHERE id = \$1`).
 					WithArgs("not_existing_user").
 					WillReturnError(sql.ErrNoRows)

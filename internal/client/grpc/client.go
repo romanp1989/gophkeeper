@@ -246,17 +246,23 @@ func parseError(err error) error {
 
 	st, ok := status.FromError(err)
 	if !ok {
-		return err
+		return fmt.Errorf("неизвестная ошибка: %w", err)
 	}
 
 	switch st.Code() {
 	case codes.Unavailable:
-		return errors.New("server unavailable")
+		return errors.New("сервер недоступен")
 	case codes.Unauthenticated:
-		return errors.New("failed to authenticate")
+		return errors.New("ошибка аутентификации")
 	case codes.AlreadyExists:
-		return errors.New("user already exists")
+		return errors.New("пользователь уже существует")
+	case codes.NotFound:
+		return errors.New("ресурс не найден")
+	case codes.PermissionDenied:
+		return errors.New("недостаточно прав")
+	case codes.DeadlineExceeded:
+		return errors.New("превышено время ожидания")
 	default:
-		return err
+		return fmt.Errorf("ошибка gRPC: %s (%d)", st.Message(), st.Code())
 	}
 }
